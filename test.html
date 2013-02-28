@@ -1,0 +1,32 @@
+<html ng-app>
+<head>
+</head>
+
+<body>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="tasks.js"></script>
+    
+	<script type="text/javascript">
+			$(document).ready(function(){
+				
+			});
+
+	</script>
+
+<!--使用TasksController-->
+<div ng-controller="TasksCtrl">
+
+
+<ul class="unstyled">
+        <li ng-repeat="task in tasks">
+					{{task}}
+        </li>
+</ul>
+
+</div>
+
+</body>
+</html>
