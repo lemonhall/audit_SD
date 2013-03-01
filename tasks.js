@@ -6,7 +6,7 @@ function TasksCtrl($scope) {
  
   $scope.addSendPlan = function() {
     console.log("Hello falsdkjflakjsdf");
-    $scope.tasks.push({userPhoneType:$scope.userPhoneType,userActive:$scope.userActive,tHeader:$scope.tHeader,tURL:$scope.tURL,tDateTime:$scope.tDateTime,tPriv:$scope.tPriv,statu:{audit:"info",icon:"icon-info-sign"},region:"济南",tOperator:"苏强"});
+    $scope.tasks.push({userPhoneType:$scope.userPhoneType,userActive:$scope.userActive,tHeader:$scope.tHeader,tURL:$scope.tURL,tDateTime:$scope.tDateTime,tPriv:$scope.tPriv,statu:{audit:"info",icon:"icon-info-sign"},region:"省公司",tOperator:"zhoumj"});
 
     $scope.userPhoneType = '';
     $scope.userActive='';
