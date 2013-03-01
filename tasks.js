@@ -16,4 +16,7 @@ function TasksCtrl($scope) {
     $scope.tPriv=0;
   };//END of addSendPlan
 
+  $scope.auditYes = function() {
+    alert("确认审核通过么？");
+  };
 }
