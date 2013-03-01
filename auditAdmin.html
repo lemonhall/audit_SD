@@ -48,6 +48,8 @@ padding: 9px 0;
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/angular.min.js"></script>
+    <script src="js/angular-resource.min.js"></script>
+    
     <script src="tasks.js"></script>
     
 	<script type="text/javascript">
@@ -123,12 +125,9 @@ padding: 9px 0;
 			<td>{{task.tDateTime}}</td>
 			<td>{{task.tPriv}}</td>
 			<td>{{task.tOperator}}</td>
-			<td>
-
-				<a data-toggle="modal" data-target="#deleteModal"><i class="icon-ok-sign" ng-click="auditYes()"></i></a>
-				<a data-toggle="modal" data-target="#deleteModal"><i class="icon-remove-sign" ></i></a>
-				<a data-toggle="modal" data-target="#deleteModal"><i class="icon-trash" ></i></a>
-								
+			<td data="{{task._id}}">
+				<a data-toggle="modal" data-target="#auditModal"><i class="icon-ok-sign" ng-click="auditTask(task._id)"></i></a>
+				<a data-toggle="modal" data-target="#denyModal"><i class="icon-remove-sign" ng-click="denyTask(task._id)"></i></a>
 			</td>												
         </tr>
 
