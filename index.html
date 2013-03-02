@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html ng-app>
   <head>
     <meta charset="utf-8">
     <title>登陆 &middot; 悟空审核下发平台</title>
@@ -49,44 +49,29 @@
 
   <body>
     <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/angular-resource.min.js"></script>
+    
+    <script src="users.js"></script>
+  
+  <div ng-controller="UserCtrl">
     <div class="container">
 
       <div class="form-signin">
         <h2 class="form-signin-heading">请登录</h2>
-        <input id="username" type="text" class="input-block-level" placeholder="用户名....">
-        <input id="password" type="password" class="input-block-level" placeholder="密码...">
+        <input id="username" ng-model="username" type="text" class="input-block-level" placeholder="用户名....">
+        <input id="password" ng-model="password" type="password" class="input-block-level" placeholder="密码...">
         <!--
         <label class="checkbox">
           <input type="checkbox" value="remember-me"> Remember me
         </label>
    		 -->
-        <button id="login_btn" class="btn btn-large btn-primary">登录</button>
+        <button id="login_btn" class="btn btn-large btn-primary" ng-click="verfy_user()">登录</button>
       </div>
 
     </div> <!-- /container -->
 
-<script type="text/javascript">
-		$(document).ready(function(){
-			console.log("Hello World~");
-				$("#login_btn").click(function(){
-					var username=$("#username").val();
-					var password=$("#password").val();
-
-					if (password!="") {
-						if (username==="zhoumj") {
-							console.log("Hi I am administrator~~");
-							window.location="auditAdmin.html";
-						}else{
-							window.location="auditResult.html"
-						}
-					}else{//password===""
-
-
-					}
-				});
-		});
-
-</script>
-
+</div><!--End of UserCtrl-->
   </body>
 </html>
