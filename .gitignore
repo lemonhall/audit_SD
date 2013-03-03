@@ -1,2 +1,8 @@
 
 dataOp.log
+
+*.json
+
+tasks.json
+
+users.json

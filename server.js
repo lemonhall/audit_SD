@@ -94,13 +94,12 @@ app.get('/uuid', function (req, res) {
 app.post('/tasks_length', function (req, res) {
   var user_login=req.body.user_login;
   //用户有误，直接退回	
-  if(user_login===""||user_login===null||user_login===undefined){
-  		window.location="/";
+  if(users.hasOwnProperty(user_login)){
+  		var length=users[user_login].taskLists.length;
+  			res.send(JSON.stringify(length));
+  }else{
+	  		res.redirect("/");  	
   }
-
-  var length=users[user_login].taskLists.length;
-  res.send(JSON.stringify(length));
-
 });
 
 //取得任务，需要添加认证，选择范围，以及取得某用户的记录的功能
@@ -130,10 +129,13 @@ app.post('/task_add', function (req, res) {
   		tasks[uuid]._id=uuid;
   		tasks[uuid].region=users[user_login].region;
   		tasks[uuid].tOperator=user_login;
-  	//用户有误，直接退回	这里有BUG
-  	if(user_login===""||user_login===null||user_login===undefined){
-  		window.location="/";
-  	}
+  //用户有误，直接退回	
+  if(users.hasOwnProperty(user_login)){
+  		var length=users[user_login].taskLists.length;
+  			res.send(JSON.stringify(length));
+  }else{
+	  		res.redirect("/");  	
+  }
   //永远不要相信客户端的录入
   if (newTask!=null && newTask!=undefined) {
 
