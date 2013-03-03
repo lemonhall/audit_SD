@@ -80,10 +80,11 @@ function TasksCtrl($scope,$http) {
   //删除任务
   $scope.delTask = function(_id) {
     if ($scope.tasks[_id].statu.audit==="info") {
-      $http.post('/task_delete',{_id:_id,user_login:user_cookies.user}).
-        success(function(data) { 
-            delete $scope.tasks[_id];
-      });
+      // $http.post('/task_delete',{_id:_id,user_login:user_cookies.user}).
+      //   success(function(data) { 
+      //       delete $scope.tasks[_id];
+      // });
+            alert("暂时不允许删除.....");
     }else{
             alert("已审核项目无法删除.....");
     }
