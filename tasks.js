@@ -1,13 +1,37 @@
+var myApp = angular.module('myApp', []).filter('weDontLike', function(){
+    
+    return function(items, name){
+        
+        var arrayToReturn = [];
+        //console.log(items);
+        for (var key in items) {
+           if(items[key]){
+            arrayToReturn.push(key);
+           }
+        }
+        return arrayToReturn;
+    };
+});
+
+
+
 function TasksCtrl($scope,$http) {
   
   var user_cookies={};
-  var page_offset=5;
+  var page_offset=20000;
   if(sessionStorage["audit_SD"]){
     user_cookies=JSON.parse(sessionStorage["audit_SD"]);
     $scope.user=user_cookies.user;
   }else{
     window.location="/";
   }
+  $scope.userType={};
+  $scope.userType['Android']=false;
+  $scope.userType['Iphone']=false;
+  $scope.userType['Nokia']=false;
+  $scope.userType['沉默']=false;
+  $scope.userType['活跃']=false;
+  $scope.userType['非活跃']=false;
  
   //更新某条目状态的内部辅助函数，由autitYes,deny来调用
   var updateStatuByID=function(_id,statu){
@@ -52,7 +76,11 @@ function TasksCtrl($scope,$http) {
     $http.get('/uuid').success(function(data) {
         console.log(data);
         uuid = data;
-        var newTask={userPhoneType:$scope.userPhoneType,userActive:$scope.userActive,tHeader:$scope.tHeader,tURL:$scope.tURL,tDateTime:$scope.tDateTime,tPriv:$scope.tPriv,statu:{audit:"info",icon:"icon-info-sign"},region:"省公司",tOperator:"zhoumj"};
+        console.log("$scope.tPriv:"+$scope.tPriv);
+        if($scope.tPriv===0 || $scope.tPriv===undefined){
+          $scope.tPriv="市分优先"
+        };
+        var newTask={userType:$scope.userType,tHeader:$scope.tHeader,tURL:$scope.tURL,tDateTime:$scope.tDateTime,tPriv:$scope.tPriv,statu:{audit:"info",icon:"icon-info-sign"},region:user_cookies.region,tOperator:user_cookies.user};
 
           //更改客户端内存中的数值
           $scope.tasks[uuid]=newTask;
@@ -63,18 +91,23 @@ function TasksCtrl($scope,$http) {
           success(function(data) {
               //最终其实还是使用了服务端验证，并返回记录并更新本地内存的方式
               //newTask只是一个初始化的模版
-              $scope.tasks[uuid]=data;
+              //$scope.tasks[uuid]=data;
           });
 
-          $scope.userPhoneType = '';
-          $scope.userActive='';
+          $scope.userType={};
+          $scope.userType['Android']=false;
+          $scope.userType['Iphone']=false;
+          $scope.userType['Nokia']=false;
+          $scope.userType['沉默']=false;
+          $scope.userType['活跃']=false;
+          $scope.userType['非活跃']=false;
+
           $scope.tHeader='';
           $scope.tURL='';
           $scope.tDateTime='';
           $scope.tPriv=0;
         console.log("length:"+uuid);
     });//END of get uuid
-    updatePages($scope.page_now);
   };//END of addSendPlan
 
   //删除任务
@@ -120,6 +153,11 @@ function TasksCtrl($scope,$http) {
   $scope.Logout = function() {
     sessionStorage["audit_SD"]="";
     window.location="/";
+  };
+
+    //测试
+  $scope.isTrue = function() {
+    console.log("falsdkjflakjsdf");
   };
 
 

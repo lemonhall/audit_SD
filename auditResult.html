@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html ng-app>
+<html ng-app="myApp">
 <head>
 <title>审核结果</title>
     <!-- Bootstrap -->
@@ -118,7 +118,13 @@ padding: 9px 0;
 		<tr ng-repeat="task in tasks | filter:search | orderBy:'tDateTime'" class="{{task.statu.audit}}">
 			<td><i class="{{task.statu.icon}}"></i></td>
 			<td>{{task.region}}</td>
-			<td>{{task.userPhoneType}}</td>
+			<td>
+        <span ng-repeat="key in task.userType | weDontLike:'Adam' ">
+          {{
+              key
+          }}
+        </span>
+      </td>
 			<td>{{task.tHeader}}</td>
 			<td><a href="{{task.tURL}}">{{task.tURL}}</a></td>
 			<td>{{task.tDateTime}}</td>
@@ -157,22 +163,29 @@ padding: 9px 0;
   </div>
   <div class="modal-body">
 
-
 <!-- 提交时调用addSendPlan方法-->
 <from class="form-horizontal" ng-submit="addSendPlan()">
-  <div class="control-group">
+  <div class="control-group" ng-class="{error: myForm.name.$invalid}">
     <label class="control-label">用户属性：</label>
     <div class="controls">
-      	<select ng-model="userPhoneType">
-		  <option selected>Android</option>
-		  <option>Iphone</option>
-		  <option>Nokia</option>
-		</select>
-		<select ng-model="userActive">
-		  <option selected>活跃</option>
-		  <option>沉默</option>
-		  <option>非活跃</option>
-		</select>
+        <label class="checkbox" >
+            <input type="checkbox" ng-model="userType['Android']">Android
+        </label>
+        <label class="checkbox" >
+            <input type="checkbox" ng-model="userType['Iphone']">Iphone
+        </label>
+        <label class="checkbox">
+            <input type="checkbox" ng-model="userType['Nokia']">Nokia
+        </label>
+        <label class="checkbox">
+            <input type="checkbox" ng-model="userType['活跃']">活跃
+        </label>
+        <label class="checkbox">
+            <input type="checkbox" ng-model="userType['沉默']">沉默
+        </label>
+        <label class="checkbox">
+            <input type="checkbox" ng-model="userType['非活跃']">非活跃
+        </label>
     </div>
   </div>
   <div class="control-group">
@@ -188,7 +201,7 @@ padding: 9px 0;
     </div>
   </div>
   <div class="control-group">
-    <label class="control-label" for="inputPassword">下发日期：</label>
+    <label class="control-label">下发日期：</label>
     <div class="controls">
       <input ng-model="tDateTime" type="text" id="datepicker">
     </div>
@@ -197,18 +210,12 @@ padding: 9px 0;
     <label class="control-label" for="inputEmail">优先级：</label>
     <div class="controls">
       <select ng-model="tPriv">
-		  <option>0</option>
-		  <option>1</option>
-		  <option>2</option>
-		  <option>3</option>
-		  <option>4</option>
-		  <option>6</option>
-		  <option>7</option>
-		  <option>8</option>
-		  <option>9</option>		  		  		  		  
-		</select>
+        <option>市分优先</option>
+        <option>省分优先</option>
+        <option>同步排重</option>                 
+    </select>
     </div>
-  </div>							  							  							  
+  </div>                                                
   <div class="control-group">
     <div class="controls">
       <input type="submit" class="btn btn-primary" ng-click="addSendPlan()" ng-disabled="myForm.$invalid"></input>
@@ -216,20 +223,9 @@ padding: 9px 0;
   </div>
 
 </form><!-- End of hor form class-->
-
   </div>
 </div>
-
-<!--Delete Plan Modal -->
-<div id="deleteModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3 id="deleteModalLabel">确认删除么？</h3>
-  </div>
-  <div class="modal-body">
-    
-  </div>
-</div>
+</div><!-- End of ng controller end-->
   <script type="text/javascript">
       $(document).ready(function(){
           // Datepicker
@@ -238,6 +234,5 @@ padding: 9px 0;
       });
 
   </script>
-</div><!-- End of ng controller end-->
 </body>
 </html>
