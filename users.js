@@ -1,7 +1,13 @@
 function UserCtrl($scope,$http) {
   var now_where_I_am=window.location;
 
-  var user_cookies=JSON.parse(localStorage["audit_SD"]);
+
+  var user_cookies={};
+  if(sessionStorage["audit_SD"]){
+    user_cookies=JSON.parse(sessionStorage["audit_SD"]);
+  }else{
+
+  }
 
   if(now_where_I_am){
 	  if(user_cookies.user!=null || user_cookies.user!=undefined){
@@ -20,11 +26,11 @@ function UserCtrl($scope,$http) {
   	  $http.post('/verfy_user',data).success(function(data) {
   	  		console.log(data);
 
-  	  			if(data.power==="admin"){
-  	  				localStorage.setItem["audit_SD"]=JSON.stringify(data);
+  	  	if(data.power==="admin"){
+  	  				sessionStorage["audit_SD"]=JSON.stringify(data);
     				window.location="auditAdmin.html";
 				}else{
-  	  				localStorage.setItem["audit_SD"]=JSON.stringify(data);
+  	  				sessionStorage["audit_SD"]=JSON.stringify(data);
 					window.location="auditResult.html";
 				}
   	  });//end of http post method

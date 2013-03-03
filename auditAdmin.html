@@ -72,7 +72,10 @@ padding: 9px 0;
           <a class="brand" href="#">悟空审核下发平台</a>
           <div class="nav-collapse collapse">
             <p class="navbar-text pull-right">
-              Logged in as <a href="#" class="navbar-link">Username</a>
+              <a href="#" class="navbar-link" ng-click="Logout()">登出</a>
+            </p>
+            <p class="navbar-text pull-right">
+              登录名:<a href="#" class="navbar-link">{{user}}</a>
             </p>
             <ul class="nav">
               <li class="active"><a href="#">Home</a></li>
@@ -134,8 +137,13 @@ padding: 9px 0;
 
 		
 	</tbody>	
-</table>	        		
-		        	<div><!-- row-fluid END-->
+</table>
+
+<span ng-repeat="page in pages">
+  <a href='#' ng-click='loadPage(page.start)'>{{page.pageNumber}}</a>  
+</span>	        		
+		        	
+            <div><!-- row-fluid END-->
 		        </div><!-- span9 END-->
 		</div><!-- row-fluid END-->
 

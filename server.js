@@ -2,6 +2,7 @@ var express = require('express');
 var app=express();
 var server = require('http').createServer(app);
 var fs = require('fs');
+var lazy = require("lazy");
 
 
 var tasks={};
@@ -24,12 +25,13 @@ var users={
 		"liaochcc":{region:"聊城",password:"liaoch0635",taskLists:[]},
 		"linyicc":{region:"临沂",password:"linyi0539",taskLists:[]},		
 		"hezecc":{region:"菏泽",password:"heze0530",taskLists:[]},
-		"laiwucc":{region:"莱芜",password:"laiwu0634",taskLists:[]}
+		"laiwucc":{region:"莱芜",password:"laiwu0634",taskLists:[]},
+		"demo":{region:"demo",password:"demo",taskLists:[]}
 };
 
 
 var uuid=0;
-var usr_login="admin";
+var user_login="demo";
 
 
 //记录操作日志的核心函数
@@ -40,14 +42,26 @@ var dbLog=function(log){
 	  console.log('The "data to append" was appended to file!');
 	});
 };
-	
+
+//从数据库日志文件恢复数据的核心初始化过程
+ new lazy(fs.createReadStream('dataOp.log'))
+     .lines
+     .forEach(function(line){
+         eval(line.toString());
+     }
+ );
+
 
 
 var syncTofs=function(){
 
-	fs.writeFile('database.json', JSON.stringify(tasks), function (err) {
+	fs.writeFile('tasks.json', JSON.stringify(tasks), function (err) {
   		if (err) throw err;
-  			console.log('It\'s saved!');
+  			console.log('tasks.json saved');
+	});
+	fs.writeFile('users.json', JSON.stringify(users), function (err) {
+  		if (err) throw err;
+  			console.log('users.json saved');
 	});
 },syncFromfs=function(){
 	fs.readFile('database.json', function (err, data) {
@@ -56,6 +70,11 @@ var syncTofs=function(){
   		tasks=JSON.parse(data);
 	});
 };
+
+//每半小时写一次数据库
+setInterval(function(){
+	syncTofs();
+},1000*60*30);
 
 //这句很关键，没有它，POST解析就无法进行
 app.use(express.bodyParser({}));
@@ -67,21 +86,36 @@ server.listen(8000);
 //原子性操作，客户端取得某记录的唯一键值，自增的
 app.get('/uuid', function (req, res) {
   uuid++;
+  dbLog("uuid++;");
   res.send(JSON.stringify(uuid));
+});
+
+//取得某用户下tasks列表的长度，用来做分页逻辑的
+app.post('/tasks_length', function (req, res) {
+  var user_login=req.body.user_login;
+  //用户有误，直接退回	
+  if(user_login===""||user_login===null||user_login===undefined){
+  		window.location="/";
+  }
+
+  var length=users[user_login].taskLists.length;
+  res.send(JSON.stringify(length));
+
 });
 
 //取得任务，需要添加认证，选择范围，以及取得某用户的记录的功能
 app.post('/tasks', function (req, res) {
 	var start=req.body.start;
 	var offset=req.body.offset;
+	var user_login=req.body.user_login;
 
 	var range_tasks={};
-	var list_length=users[usr_login].taskLists.length;
-	var index=0;
+	var list_length=users[user_login].taskLists.length;
+	var _uuid=0;
 
 	for(var i=start;i>=start-offset;i--){
-		index=users[usr_login].taskLists[i];
-		range_tasks[index]=tasks[index];
+		_uuid=users[user_login].taskLists[i];
+		range_tasks[_uuid]=tasks[_uuid];
 	}
 
   res.send(JSON.stringify(range_tasks));
@@ -91,30 +125,65 @@ app.post('/tasks', function (req, res) {
 app.post('/task_add', function (req, res) {
 	var uuid=req.body.uuid;
 	var newTask=req.body.newTask;
+	var user_login=req.body.user_login;
   		tasks[uuid]=newTask;
   		tasks[uuid]._id=uuid;
-  	dbLog("tasks["+uuid+"]="+JSON.stringify(newTask)+";");
-  	dbLog("tasks["+uuid+"]._id="+uuid+";");
+  		tasks[uuid].region=users[user_login].region;
+  		tasks[uuid].tOperator=user_login;
+  	//用户有误，直接退回	这里有BUG
+  	if(user_login===""||user_login===null||user_login===undefined){
+  		window.location="/";
+  	}
+  //永远不要相信客户端的录入
+  if (newTask!=null && newTask!=undefined) {
+
+  	if (newTask.tPriv="") {tasks[uuid].tPriv=0};
+
+  	dbLog("tasks["+uuid+"]="+JSON.stringify(tasks[uuid])+";");
 
   	//如果用户不是超级用户，则同时要向admin用户的列表和普通用户的列表中同时添加值，以索引
-  	if(users[usr_login].power!="admin"){
-  		 users[usr_login].taskLists.push(uuid);
-  		dbLog("users['"+usr_login+"'].taskLists.push("+uuid+");");
+  	if(users[user_login].power!="admin"){
+  		users[user_login].taskLists.push(uuid);
+  		dbLog("users['"+user_login+"'].taskLists.push("+uuid+");");
   		 //这里有bug
   		 users["admin"].taskLists.push(uuid);
+  		 users["zhoumj"].taskLists.push(uuid);
+  		 dbLog("users['admin'].taskLists.push("+uuid+");");
+  		 dbLog("users['zhoumj'].taskLists.push("+uuid+");");
   	}else{
-  		dbLog("users['"+usr_login+"'].taskLists.push("+uuid+");");
-  		users[usr_login].taskLists.push(uuid);
+  		 //这里有bug
+  		 users["admin"].taskLists.push(uuid);
+  		 users["zhoumj"].taskLists.push(uuid);
+  		 dbLog("users['admin'].taskLists.push("+uuid+");");
+  		 dbLog("users['zhoumj'].taskLists.push("+uuid+");"); 		 
   	}
   	//console.log(tasks);
+  	res.send(JSON.stringify(tasks[uuid]));
+  	}//end of check newTask input
 });
 
 
 //删除某条未经审核的任务
 app.post('/task_delete', function (req, res) {
-	var del_item=req.body;
-
-});
+	//{_id:_id,start:$scope.page_now,offset:page_offset,user_login:user_cookies.user})
+	var del_id=req.body._id;
+	var user_login=req.body.user_login;
+	//TODO:加上数据库日志，另外需要在用户和两个admin用户的tasksList里搜索这个id并剔除
+	if(tasks.hasOwnProperty(del_id)){
+			delete tasks[del_id];
+			dbLog("delete tasks["+del_id+"];");
+			var userIndex=users[user_login].taskLists.indexOf(del_id);
+			var adminIndex=users["admin"].taskLists.indexOf(del_id);
+				users[user_login].taskLists.splice(userIndex, 1);
+				users["admin"].taskLists.splice(adminIndex, 1);
+				users["zhoumj"].taskLists.splice(adminIndex, 1);
+			dbLog("users["+user_login+"].taskLists.splice("+userIndex+", 1);");
+			dbLog("users['admin'].taskLists.splice("+adminIndex+", 1);");
+			dbLog("users['zhoumj'].taskLists.splice("+adminIndex+", 1);");
+	}else{
+			throw "can not find del_id";
+	}
+});//END of 删除某条状态
 
 //更新某条的状态
 app.post('/updateStatuByID', function (req, res) {
@@ -122,7 +191,7 @@ app.post('/updateStatuByID', function (req, res) {
 	var statu=req.body.statu;
 	console.log(req.body);
 
-	if (_id!=null || _id!=undefined) {
+	if (_id!=null && _id!=undefined && tasks.hasOwnProperty(_id) ) {
 		tasks[_id].statu=statu;
 		dbLog("tasks["+_id+"].statu="+JSON.stringify(statu)+";");
 	}else{
