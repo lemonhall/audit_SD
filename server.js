@@ -78,9 +78,22 @@ setInterval(function(){
 
 //这句很关键，没有它，POST解析就无法进行
 app.use(express.bodyParser({}));
+
+//将三个重要文件屏蔽掉
+app.get('/server.js',function(req,res){
+	res.send("???????");
+});
+app.get('/tasks.json',function(req,res){
+	res.send("???????");
+});
+app.get('/users.json',function(req,res){
+	res.send("???????");
+});
+
 app.use('/', express.static(__dirname + '/'));
 
 server.listen(8000);
+
 
 
 //原子性操作，客户端取得某记录的唯一键值，自增的
